@@ -26,7 +26,7 @@ url="https://url.to.ctfd"
 login='/login'
 exp='/admin/export'
 
-# See manpage for date for format options. 
+# See date manpage for format options. 
 # Also controls where the backup is stored.
 datefm="+backups/ctfd_backup.%Y.%m.%d_%H:%I.zip"
 
@@ -62,5 +62,5 @@ backup_request=$($curl \
 	> $backupfn)
 
 # Cleanup
-$(rm cookies_loggedin.txt)
-$(rm cookies.txt)
+$($rm cookies_loggedin.txt)
+$($rm cookies.txt)
