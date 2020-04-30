@@ -17,27 +17,29 @@
 # Works fine with  CTFd 2.3.3. 
 #
 # Stuff you need to edit:
-user="username"
-pass="password"
-url="https://url.to.ctfd"
+user=""
+pass=""
+url="url.to.ctfd"
+backupdir="/path/to/backups/"
+
+# See manpage for date for format options. 
+# Also controls where the backup is stored.
+# Default below is ctfd.2020.04.30_21:40.zip
+datefm="+ctfd.%Y.%m.%d_%H:%M.zip"
 
 
 # CTFd path to login and export:
 login='/login'
 exp='/admin/export'
 
-# See date manpage for format options. 
-# Also controls where the backup is stored.
-datefm="+backups/ctfd_backup.%Y.%m.%d_%H:%I.zip"
-
 # Misc other paths:
 rm="/bin/rm"
-curl="/usr/bin/curl"
+curl="/usr/bin/curl -s"
 date="/bin/date"
 
 backupfn=$($date $datefm)
 
-initial_request=$($curl -c "cookies.txt" -s $url)
+initial_request=$($curl -c "cookies.txt" $url)
 regexp='csrf_nonce\ =\ \"[a-z0-99]+\"'
 
 # Get nonce:
@@ -46,7 +48,6 @@ nonce=$(echo $initial_request | grep -P -o "$regexp" | cut -d \" -f 2)
 # Logon
 post_request=$($curl \
 	--header 'Content-Type: application/x-www-form-urlencoded' \
-	-s \
 	-b "cookies.txt" \
 	-c "cookies_loggedin.txt" \
 	--data-urlencode "name=$user" \
@@ -57,10 +58,9 @@ post_request=$($curl \
 # Get backup
 backup_request=$($curl \
 	-b cookies_loggedin.txt \
-	-s \
 	"$url$exp" \
-	> $backupfn)
+	> $backupdir$backupfn)
 
 # Cleanup
-$($rm cookies_loggedin.txt)
-$($rm cookies.txt)
+$(rm cookies_loggedin.txt)
+$(rm cookies.txt)
